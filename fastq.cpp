@@ -2,15 +2,31 @@
 #include "fastq.h"
 
 ArrayBuffer::ArrayBuffer(int capacity){
-
+    if (capacity < 1) {
+        m_buffer = nullptr;
+        m_capacity = 0;
+    } else {
+        m_buffer = new int [capacity];
+        m_capacity = capacity;
+    }
+    m_count = 0;
+    m_start = 0;
+    m_end = 0; //the one after the end
+    m_next = nullptr;
 }
 
 void ArrayBuffer::clear(){
+    m_capacity = 0;
+    m_count = 0;
+    m_start = 0;
+    m_end = 0;
+    m_next = nullptr;
 
+    delete[] m_buffer;
 }
 
 ArrayBuffer::~ArrayBuffer(){
-
+    delete[] m_buffer;
 }
 
 bool ArrayBuffer::empty() const {
