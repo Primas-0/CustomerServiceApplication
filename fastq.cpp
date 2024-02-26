@@ -11,17 +11,19 @@ ArrayBuffer::ArrayBuffer(int capacity){
     }
     m_count = 0;
     m_start = 0;
-    m_end = 0; //the one after the end
+    m_end = 0;
     m_next = nullptr;
 }
 
 void ArrayBuffer::clear(){
+    //reinitialize all member variables
     m_capacity = 0;
     m_count = 0;
     m_start = 0;
     m_end = 0;
     m_next = nullptr;
 
+    //deallocate all memory
     delete[] m_buffer;
 }
 
@@ -30,11 +32,26 @@ ArrayBuffer::~ArrayBuffer(){
 }
 
 bool ArrayBuffer::empty() const {
-
+    //return true if array buffer is empty, otherwise return false
+    if (m_buffer == nullptr) {
+        return true;
+    }
+    return false;
 }
 
 void ArrayBuffer::enqueue(int data){
+    //This function inserts the data into the array buffer at the proper index. The proper index is the end of the list
+    // indicated by the member variable m_end. After every insertion, the function updates the appropriate member
+    // variables in the object such as m_end and m_count. If the array is already full, the function throws the
+    // exception overflow_error. The exception is defined in the include library <stdexcept>.
 
+    if (m_count == m_capacity) {
+        throw overflow_error("Array is full");
+    }
+
+    m_buffer[m_end] = data;
+    m_end++;
+    m_count++;
 }
 
 int ArrayBuffer::dequeue(){
