@@ -16,19 +16,19 @@ ArrayBuffer::ArrayBuffer(int capacity){
 }
 
 void ArrayBuffer::clear(){
+    //deallocate all memory
+    delete[] m_buffer;
+
     //reinitialize all member variables
     m_capacity = 0;
     m_count = 0;
     m_start = 0;
     m_end = 0;
     m_next = nullptr;
-
-    //deallocate all memory
-    delete[] m_buffer;
 }
 
 ArrayBuffer::~ArrayBuffer(){
-    delete[] m_buffer;
+    clear();
 }
 
 bool ArrayBuffer::empty() const {
@@ -46,7 +46,7 @@ void ArrayBuffer::enqueue(int data){
     // exception overflow_error. The exception is defined in the include library <stdexcept>.
 
     if (m_count == m_capacity) {
-        throw overflow_error("Array is full");
+        throw overflow_error("Array buffer is full");
     }
 
     m_buffer[m_end] = data;
@@ -55,7 +55,22 @@ void ArrayBuffer::enqueue(int data){
 }
 
 int ArrayBuffer::dequeue(){
+    //This function removes a piece of data from the start of the list in the array. The start index is indicated by the
+    // member variable m_start. After removal, the function updates the appropriate member variables in the object such
+    // as m_start and m_count. The dequeue function returns the data value. If the buffer is empty the function throws
+    // the exception underflow_error. The exception is defined in the include library <stdexcept>.
 
+    if (m_count == 0) {
+        throw underflow_error("Array buffer is empty");
+    }
+
+    int dequeuedData = m_buffer[m_start];
+
+    m_buffer[m_start] = 0;
+    m_start++;
+    m_count--;
+
+    return dequeuedData;
 }
 
 ArrayBuffer::ArrayBuffer(const ArrayBuffer & rhs){
