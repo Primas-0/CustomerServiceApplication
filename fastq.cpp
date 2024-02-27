@@ -12,7 +12,6 @@ ArrayBuffer::ArrayBuffer(int capacity){
     m_count = 0;
     m_start = 0;
     m_end = 0;
-    m_next = nullptr;
 }
 
 void ArrayBuffer::clear(){
@@ -24,7 +23,6 @@ void ArrayBuffer::clear(){
     m_count = 0;
     m_start = 0;
     m_end = 0;
-    m_next = nullptr;
 }
 
 ArrayBuffer::~ArrayBuffer(){
@@ -40,45 +38,60 @@ bool ArrayBuffer::empty() const {
 }
 
 void ArrayBuffer::enqueue(int data){
-    //This function inserts the data into the array buffer at the proper index. The proper index is the end of the list
-    // indicated by the member variable m_end. After every insertion, the function updates the appropriate member
-    // variables in the object such as m_end and m_count. If the array is already full, the function throws the
-    // exception overflow_error. The exception is defined in the include library <stdexcept>.
-
     if (m_count == m_capacity) {
-        throw overflow_error("Array buffer is full");
+        throw overflow_error("Buffer is full");
     }
 
     m_buffer[m_end] = data;
-    m_end++;
+    m_end = (m_end + 1) % m_capacity;
     m_count++;
 }
 
 int ArrayBuffer::dequeue(){
-    //This function removes a piece of data from the start of the list in the array. The start index is indicated by the
-    // member variable m_start. After removal, the function updates the appropriate member variables in the object such
-    // as m_start and m_count. The dequeue function returns the data value. If the buffer is empty the function throws
-    // the exception underflow_error. The exception is defined in the include library <stdexcept>.
-
     if (m_count == 0) {
-        throw underflow_error("Array buffer is empty");
+        throw underflow_error("Buffer is empty");
     }
 
     int dequeuedData = m_buffer[m_start];
 
     m_buffer[m_start] = 0;
-    m_start++;
+    m_start = (m_start + 1) % m_capacity;
     m_count--;
 
     return dequeuedData;
 }
 
 ArrayBuffer::ArrayBuffer(const ArrayBuffer & rhs){
+    m_capacity = rhs.m_capacity;
+    m_count = rhs.m_count;
+    m_start = rhs.m_start;
+    m_end = rhs.m_end;
 
+    m_buffer = new int[rhs.m_capacity];
+
+    for (int i = 0; i < rhs.m_capacity; i++) {
+        m_buffer[i] = rhs.m_buffer[i];
+    }
 }
 
 const ArrayBuffer & ArrayBuffer::operator=(const ArrayBuffer & rhs){
+    if (this == &rhs) {
+        return *this;
+    }
 
+    clear();
+
+    m_capacity = rhs.m_capacity;
+    m_count = rhs.m_count;
+    m_start = rhs.m_start;
+    m_end = rhs.m_end;
+    m_buffer = new int[rhs.m_capacity];
+
+    for (int i = 0; i < rhs.m_capacity; i++) {
+        m_buffer[i] = rhs.m_buffer[i];
+    }
+
+    return *this;
 }
 
 void ArrayBuffer::dump(){
