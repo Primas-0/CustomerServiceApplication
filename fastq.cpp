@@ -2,6 +2,7 @@
 #include "fastq.h"
 
 ArrayBuffer::ArrayBuffer(int capacity){
+    //allocate memory for array if capacity >= 1
     if (capacity < 1) {
         m_buffer = nullptr;
         m_capacity = 0;
@@ -9,6 +10,7 @@ ArrayBuffer::ArrayBuffer(int capacity){
         m_buffer = new int [capacity];
         m_capacity = capacity;
     }
+    //initialize all other member variables
     m_count = 0;
     m_start = 0;
     m_end = 0;
@@ -42,7 +44,10 @@ void ArrayBuffer::enqueue(int data){
         throw overflow_error("Buffer is full");
     }
 
+    //insert data at end of array
     m_buffer[m_end] = data;
+
+    //increment m_end and m_count, moving m_end back to beginning if it goes past capacity
     m_end = (m_end + 1) % m_capacity;
     m_count++;
 }
@@ -52,9 +57,13 @@ int ArrayBuffer::dequeue(){
         throw underflow_error("Buffer is empty");
     }
 
+    //store data from start of array to return later
     int dequeuedData = m_buffer[m_start];
 
+    //remove data from array
     m_buffer[m_start] = 0;
+
+    //increment m_start and decrement m_count, moving m_start back to beginning if it goes past capacity
     m_start = (m_start + 1) % m_capacity;
     m_count--;
 
@@ -62,31 +71,36 @@ int ArrayBuffer::dequeue(){
 }
 
 ArrayBuffer::ArrayBuffer(const ArrayBuffer & rhs){
+    //construct current object with same dimensions as rhs
     m_capacity = rhs.m_capacity;
     m_count = rhs.m_count;
     m_start = rhs.m_start;
     m_end = rhs.m_end;
-
     m_buffer = new int[rhs.m_capacity];
 
+    //make current object a deep copy of rhs
     for (int i = 0; i < rhs.m_capacity; i++) {
         m_buffer[i] = rhs.m_buffer[i];
     }
 }
 
 const ArrayBuffer & ArrayBuffer::operator=(const ArrayBuffer & rhs){
+    //if self-assignment, return current object without any changes
     if (this == &rhs) {
         return *this;
     }
 
+    //otherwise, destroy current object
     clear();
 
+    //construct current object with same dimensions as rhs
     m_capacity = rhs.m_capacity;
     m_count = rhs.m_count;
     m_start = rhs.m_start;
     m_end = rhs.m_end;
     m_buffer = new int[rhs.m_capacity];
 
+    //make current object a deep copy of rhs
     for (int i = 0; i < rhs.m_capacity; i++) {
         m_buffer[i] = rhs.m_buffer[i];
     }
@@ -111,30 +125,61 @@ void ArrayBuffer::dump(){
 }
 
 ListBuffer::ListBuffer(int minBufCapacity){
+    //create ListBuffer object which contains the first ArrayBuffer object
+    if (minBufCapacity < 1) {
+        m_cursor = new ArrayBuffer(DEFAULT_MIN_CAPACITY);
+    } else {
+        m_cursor = new ArrayBuffer(minBufCapacity);
+    }
 
+    //update size to reflect new node
+    m_listSize = 1;
 }
 
 ListBuffer::~ListBuffer(){
-
+    clear();
 }
-void ListBuffer::clear(){
 
+void ListBuffer::clear(){
+    ArrayBuffer *curr = m_cursor;
+
+    //loop through the linked list and remove each array buffer, until it circles back to the beginning
+    do {
+        ArrayBuffer* next = curr->m_next;
+        curr->clear();
+        curr = next;
+    } while (curr != m_cursor);
+
+    //reset all other member variables
+    m_cursor = nullptr;
+    m_listSize = 0;
 }
 
 void ListBuffer::enqueue(const int& data) {
+    try {
+        m_cursor->enqueue(data);
+    } catch (overflow_error e) {
+        //once the buffer is full, insert a new node (ArrayBuffer object of double the size) into the linked list
+        ArrayBuffer *newBuffer = new ArrayBuffer(m_listSize * INCREASE_FACTOR);
+        newBuffer->m_next = m_cursor->m_next;
+        m_cursor->m_next = newBuffer;
 
+        //advance the cursor and insert data
+        m_cursor = newBuffer;
+        m_cursor->enqueue(data);
+    }
 }
 
 int ListBuffer::dequeue() {
-
+    //TODO
 }
 
 ListBuffer::ListBuffer(const ListBuffer & rhs){
-
+    //TODO
 }
 
 const ListBuffer & ListBuffer::operator=(const ListBuffer & rhs){
-
+    //TODO
 }
 
 void ListBuffer::dump(){
