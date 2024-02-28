@@ -159,6 +159,11 @@ void ListBuffer::enqueue(const int& data) {
     try {
         m_cursor->enqueue(data);
     } catch (overflow_error e) {
+        //TODO: To limit the size of buffer arrays we use the constant global variable MAX_FACTOR. For example, if the
+        // minimum size of buffer is 100, the maximum size of a buffer cannot exceed (MAX_FACTOR x 100). As soon as we
+        // reach to the maximum size, the next buffer will be created with the minimum size which is defined by the
+        // variable member m_minBufCapacity.
+
         //once the buffer is full, insert a new node (ArrayBuffer object of double the size) into the linked list
         ArrayBuffer *newBuffer = new ArrayBuffer(m_listSize * INCREASE_FACTOR);
         newBuffer->m_next = m_cursor->m_next;
@@ -171,7 +176,22 @@ void ListBuffer::enqueue(const int& data) {
 }
 
 int ListBuffer::dequeue() {
-    //TODO
+    ArrayBuffer *oldestBuffer = m_cursor->m_next;
+
+    try {
+        return oldestBuffer->dequeue();
+    } catch (underflow_error e) {
+        //if there is only one node in the linked list and its buffer is empty, do not remove the node (throw exception)
+        if (m_listSize == 1) {
+            throw underflow_error("Must have at least one node in the linked list");
+        }
+
+        m_cursor->m_next = oldestBuffer->m_next;
+        oldestBuffer->clear();
+        oldestBuffer = oldestBuffer->m_next;
+
+        return oldestBuffer->dequeue();
+    }
 }
 
 ListBuffer::ListBuffer(const ListBuffer & rhs){
