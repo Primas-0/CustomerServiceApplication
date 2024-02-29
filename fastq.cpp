@@ -14,6 +14,7 @@ ArrayBuffer::ArrayBuffer(int capacity){
     m_count = 0;
     m_start = 0;
     m_end = 0;
+    m_next = nullptr;
 }
 
 void ArrayBuffer::clear(){
@@ -25,10 +26,11 @@ void ArrayBuffer::clear(){
     m_count = 0;
     m_start = 0;
     m_end = 0;
+    m_next = nullptr;
 }
 
 ArrayBuffer::~ArrayBuffer(){
-    clear();
+    ArrayBuffer::clear();
 }
 
 bool ArrayBuffer::empty() const {
@@ -76,6 +78,7 @@ ArrayBuffer::ArrayBuffer(const ArrayBuffer & rhs){
     m_count = rhs.m_count;
     m_start = rhs.m_start;
     m_end = rhs.m_end;
+    m_next = nullptr;
     m_buffer = new int[rhs.m_capacity];
 
     //make current object a deep copy of rhs
@@ -91,13 +94,14 @@ const ArrayBuffer & ArrayBuffer::operator=(const ArrayBuffer & rhs){
     }
 
     //otherwise, destroy current object
-    clear();
+    ArrayBuffer::clear();
 
     //construct current object with same dimensions as rhs
     m_capacity = rhs.m_capacity;
     m_count = rhs.m_count;
     m_start = rhs.m_start;
     m_end = rhs.m_end;
+    m_next = nullptr;
     m_buffer = new int[rhs.m_capacity];
 
     //make current object a deep copy of rhs
@@ -137,7 +141,7 @@ ListBuffer::ListBuffer(int minBufCapacity){
 }
 
 ListBuffer::~ListBuffer(){
-    clear();
+    ListBuffer::clear();
 }
 
 void ListBuffer::clear(){
@@ -146,7 +150,7 @@ void ListBuffer::clear(){
     //loop through the linked list and remove each array buffer, until it circles back to the beginning
     do {
         ArrayBuffer* next = curr->m_next;
-        curr->clear();
+        curr->ArrayBuffer::clear();
         curr = next;
     } while (curr != m_cursor);
 
@@ -159,13 +163,17 @@ void ListBuffer::enqueue(const int& data) {
     try {
         m_cursor->enqueue(data);
     } catch (overflow_error e) {
-        //TODO: To limit the size of buffer arrays we use the constant global variable MAX_FACTOR. For example, if the
-        // minimum size of buffer is 100, the maximum size of a buffer cannot exceed (MAX_FACTOR x 100). As soon as we
-        // reach to the maximum size, the next buffer will be created with the minimum size which is defined by the
-        // variable member m_minBufCapacity.
+        ArrayBuffer* newBuffer = nullptr;
 
-        //once the buffer is full, insert a new node (ArrayBuffer object of double the size) into the linked list
-        ArrayBuffer *newBuffer = new ArrayBuffer(m_listSize * INCREASE_FACTOR);
+        //once the buffer is full, insert a new node (ArrayBuffer object) into the linked list
+        if (m_listSize < MAX_FACTOR * m_minBufCapacity) {
+            //new buffer is double the size if max size has not been reached
+            newBuffer = new ArrayBuffer(m_listSize * INCREASE_FACTOR);
+        } else {
+            //otherwise, new buffer is created with the minimum size
+            newBuffer = new ArrayBuffer(m_minBufCapacity);
+        }
+
         newBuffer->m_next = m_cursor->m_next;
         m_cursor->m_next = newBuffer;
 
@@ -186,20 +194,74 @@ int ListBuffer::dequeue() {
             throw underflow_error("Must have at least one node in the linked list");
         }
 
+        //remove the node containing the empty buffer from the linked list
         m_cursor->m_next = oldestBuffer->m_next;
-        oldestBuffer->clear();
-        oldestBuffer = oldestBuffer->m_next;
+        oldestBuffer->ArrayBuffer::clear();
 
+        //remove data from the next node
+        oldestBuffer = oldestBuffer->m_next;
         return oldestBuffer->dequeue();
     }
 }
 
 ListBuffer::ListBuffer(const ListBuffer & rhs){
-    //TODO
+    //mirror member variables
+    m_listSize = rhs.m_listSize;
+    m_minBufCapacity = rhs.m_minBufCapacity;
+
+    ArrayBuffer *rhsCurr = rhs.m_cursor;
+    ArrayBuffer *prevBuffer = nullptr;
+
+    do {
+        //create a new node copy using the ArrayBuffer copy constructor
+        ArrayBuffer *newBuffer = new ArrayBuffer(*rhsCurr);
+
+        //first node copied is stored as m_cursor, rest are linked to their immediate predecessor
+        if (m_cursor == nullptr) {
+            m_cursor = newBuffer;
+        } else {
+            prevBuffer->m_next = newBuffer;
+        }
+
+        //advance previous node pointer
+        prevBuffer = newBuffer;
+
+        //advance target node in rhs
+        rhsCurr = rhsCurr->m_next;
+    } while (rhsCurr != rhs.m_cursor);
+
+    //sets next of current node (final node copied) to the oldest node (first node copied), completing the circle
+    prevBuffer->m_next = m_cursor;
 }
 
 const ListBuffer & ListBuffer::operator=(const ListBuffer & rhs){
     //TODO
+    //if self-assignment, return current object without any changes
+    if (this == &rhs) {
+        return *this;
+    }
+
+    //otherwise, destroy current object
+    ListBuffer::clear();
+
+    //create a deep copy of rhs (identical to copy constructor)
+    m_listSize = rhs.m_listSize;
+    m_minBufCapacity = rhs.m_minBufCapacity;
+    ArrayBuffer *rhsCurr = rhs.m_cursor;
+    ArrayBuffer *prevBuffer = nullptr;
+    do {
+        ArrayBuffer *newBuffer = new ArrayBuffer(*rhsCurr);
+        if (m_cursor == nullptr) {
+            m_cursor = newBuffer;
+        } else {
+            prevBuffer->m_next = newBuffer;
+        }
+        prevBuffer = newBuffer;
+        rhsCurr = rhsCurr->m_next;
+    } while (rhsCurr != rhs.m_cursor);
+    prevBuffer->m_next = m_cursor;
+
+    return *this;
 }
 
 void ListBuffer::dump(){
