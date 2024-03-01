@@ -166,13 +166,14 @@ void ListBuffer::enqueue(const int& data) {
         ArrayBuffer* newBuffer = nullptr;
 
         //once the buffer is full, insert a new node (ArrayBuffer object) into the linked list
-        if (m_listSize < MAX_FACTOR * m_minBufCapacity) {
+        if (m_cursor->m_capacity < MAX_FACTOR * m_minBufCapacity) {
             //new buffer is double the size if max size has not been reached
-            newBuffer = new ArrayBuffer(m_listSize * INCREASE_FACTOR);
+            newBuffer = new ArrayBuffer(m_cursor->m_capacity * INCREASE_FACTOR);
         } else {
             //otherwise, new buffer is created with the minimum size
             newBuffer = new ArrayBuffer(m_minBufCapacity);
         }
+        m_listSize++;
 
         newBuffer->m_next = m_cursor->m_next;
         m_cursor->m_next = newBuffer;
@@ -197,6 +198,7 @@ int ListBuffer::dequeue() {
         //remove the node containing the empty buffer from the linked list
         m_cursor->m_next = oldestBuffer->m_next;
         oldestBuffer->ArrayBuffer::clear();
+        m_listSize--;
 
         //remove data from the next node
         oldestBuffer = oldestBuffer->m_next;
@@ -235,7 +237,6 @@ ListBuffer::ListBuffer(const ListBuffer & rhs){
 }
 
 const ListBuffer & ListBuffer::operator=(const ListBuffer & rhs){
-    //TODO
     //if self-assignment, return current object without any changes
     if (this == &rhs) {
         return *this;
