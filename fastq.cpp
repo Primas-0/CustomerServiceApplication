@@ -79,7 +79,12 @@ ArrayBuffer::ArrayBuffer(const ArrayBuffer &rhs) {
     m_start = rhs.m_start;
     m_end = rhs.m_end;
     m_next = nullptr;
-    m_buffer = new int[rhs.m_capacity];
+
+    if (rhs.m_buffer == nullptr) {
+        m_buffer = nullptr;
+    } else {
+        m_buffer = new int[rhs.m_capacity];
+    }
 
     //make current object a deep copy of rhs
     for (int i = 0; i < rhs.m_capacity; i++) {
@@ -102,7 +107,12 @@ const ArrayBuffer &ArrayBuffer::operator=(const ArrayBuffer &rhs) {
     m_start = rhs.m_start;
     m_end = rhs.m_end;
     m_next = nullptr;
-    m_buffer = new int[rhs.m_capacity];
+
+    if (rhs.m_buffer == nullptr) {
+        m_buffer = nullptr;
+    } else {
+        m_buffer = new int[rhs.m_capacity];
+    }
 
     //make current object a deep copy of rhs
     for (int i = 0; i < rhs.m_capacity; i++) {
@@ -131,8 +141,10 @@ ListBuffer::ListBuffer(int minBufCapacity) {
     //create ListBuffer object which contains the first ArrayBuffer object
     if (minBufCapacity < 1) {
         m_cursor = new ArrayBuffer(DEFAULT_MIN_CAPACITY);
+        m_minBufCapacity = DEFAULT_MIN_CAPACITY;
     } else {
         m_cursor = new ArrayBuffer(minBufCapacity);
+        m_minBufCapacity = minBufCapacity;
     }
 
     //make sure linked list is always circular
@@ -148,6 +160,10 @@ ListBuffer::~ListBuffer() {
 
 void ListBuffer::clear() {
     ArrayBuffer *curr = m_cursor;
+
+    if (curr == nullptr) {
+        return;
+    }
 
     //loop through the linked list and remove each array buffer, until it circles back to the beginning
     do {
@@ -210,6 +226,7 @@ int ListBuffer::dequeue() {
 
 ListBuffer::ListBuffer(const ListBuffer &rhs) {
     //mirror member variables
+    m_cursor = nullptr;
     m_listSize = rhs.m_listSize;
     m_minBufCapacity = rhs.m_minBufCapacity;
 
