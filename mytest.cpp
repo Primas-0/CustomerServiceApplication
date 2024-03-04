@@ -204,7 +204,7 @@ bool Tester::testArrayBufferClearNormal() {
 
 
 bool Tester::testArrayBufferIsEmpty() {
-    ArrayBuffer emptyArray(-6);
+    ArrayBuffer emptyArray(6);
 
     if (emptyArray.empty()) {
         return true;
