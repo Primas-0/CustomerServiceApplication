@@ -22,6 +22,7 @@ void ArrayBuffer::clear() {
     delete[] m_buffer;
 
     //reinitialize all member variables
+    m_buffer = nullptr;
     m_capacity = 0;
     m_count = 0;
     m_start = 0;
