@@ -115,6 +115,20 @@ public:
 
     bool testArrayBufferClearEmpty();
     bool testArrayBufferClearNormal();
+
+    bool testArrayBufferIsEmpty();
+    bool testArrayBufferNotEmpty();
+
+    bool testArrayBufferEnqueueAndDequeueEdge();
+    bool testArrayBufferEnqueueAndDequeueNormal();
+    bool testArrayBufferEnqueueFull();
+    bool testArrayBufferDequeueEmpty();
+
+    bool testArrayBufferCopyConstructorEdge();
+    bool testArrayBufferCopyConstructorNormal();
+
+    bool testArrayBufferAssignmentOperatorEdge();
+    bool testArrayBufferAssignmentOperatorNormal();
 };
 
 bool Tester::testArrayBufferConstructorError(int capacity) {
@@ -170,18 +184,18 @@ bool Tester::testArrayBufferClearEmpty() {
 
 bool Tester::testArrayBufferClearNormal() {
     //construct normal array buffer
-    ArrayBuffer array(3);
+    ArrayBuffer filledArray(3);
 
     //fill buffer with random data
     Random randObject(MINDATA, MAXDATA);
-    for (int i = 0; i < array.m_capacity; i++) {
-        array.enqueue(randObject.getRandNum());
+    for (int i = 0; i < filledArray.m_capacity; i++) {
+        filledArray.enqueue(randObject.getRandNum());
     }
 
-    array.clear();
+    filledArray.clear();
 
-    if (array.m_buffer == nullptr && array.m_capacity == 0 && array.m_count == 0 && array.m_start == 0 &&
-        array.m_end == 0 && array.m_next == nullptr) {
+    if (filledArray.m_buffer == nullptr && filledArray.m_capacity == 0 && filledArray.m_count == 0 &&
+        filledArray.m_start == 0 && filledArray.m_end == 0 && filledArray.m_next == nullptr) {
         //test passes if array buffer has been emptied
         return true;
     }
@@ -189,40 +203,108 @@ bool Tester::testArrayBufferClearNormal() {
 }
 
 
+bool Tester::testArrayBufferIsEmpty() {
+    ArrayBuffer emptyArray(-6);
+
+    if (emptyArray.empty()) {
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testArrayBufferNotEmpty() {
+    ArrayBuffer filledArray(6);
+
+    //fill buffer with random data
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < filledArray.m_capacity; i++) {
+        filledArray.enqueue(randObject.getRandNum());
+    }
+
+    if (!filledArray.empty()) {
+        return true;
+    }
+    return false;
+}
+
+
+bool Tester::testArrayBufferEnqueueAndDequeueEdge() {
+    return false;
+}
+
+
 int main() {
     Tester tester;
 
-    //constructor tests
-    cout << "Testing Constructor (error case) - creates an empty object:" << endl;
+    //ArrayBuffer constructor tests
+    cout << "Testing ArrayBuffer Constructor (error case) - creates an empty object:" << endl;
     if (tester.testArrayBufferConstructorError(-9)) {
         cout << "\tConstructor passed!" << endl;
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing Constructor (edge case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout << "Testing ArrayBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:" << endl;
     if (tester.testArrayBufferConstructorEdge(1)) {
         cout << "\tConstructor passed!" << endl;
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing Constructor (normal case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout << "Testing ArrayBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:" << endl;
     if (tester.testArrayBufferConstructorNormal(9)) {
         cout << "\tConstructor passed!" << endl;
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
 
-    //clear tests
-    cout << "Testing Clear (edge case) - empties the current object:" << endl;
+    //ArrayBuffer clear tests
+    cout << "Testing ArrayBuffer Clear (edge case) - empties the current object:" << endl;
     if (tester.testArrayBufferClearEmpty()) {
         cout << "\tClear passed!" << endl;
     } else {
         cout << "\t***Clear failed!***" << endl;
     }
-    cout << "Testing Constructor (normal case) - empties the current object:" << endl;
+    cout << "Testing ArrayBuffer Clear (normal case) - empties the current object:" << endl;
     if (tester.testArrayBufferClearNormal()) {
         cout << "\tClear passed!" << endl;
     } else {
         cout << "\t***Clear failed!***" << endl;
     }
+
+    //ArrayBuffer empty tests
+    cout << "Testing ArrayBuffer Empty (true case) - ____:" << endl;
+    if (tester.testArrayBufferIsEmpty()) {
+        cout << "\tEmpty passed!" << endl;
+    } else {
+        cout << "\t***Empty failed!***" << endl;
+    }
+    cout << "Testing ArrayBuffer Empty (false case) - ____:" << endl;
+    if (tester.testArrayBufferNotEmpty()) {
+        cout << "\tEmpty passed!" << endl;
+    } else {
+        cout << "\t***Empty failed!***" << endl;
+    }
+
+    //ArrayBuffer enqueue and dequeue tests
+
+
+    //ArrayBuffer copy constructor tests
+
+
+    //ArrayBuffer assignment operator tests
+
+
+
+    //ListBuffer constructor tests
+
+
+    //ListBuffer clear tests
+
+
+    //ListBuffer enqueue and dequeue tests
+
+
+    //ListBuffer copy constructor tests
+
+
+    //ListBuffer assignment operator tests
 }
