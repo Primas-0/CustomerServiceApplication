@@ -36,7 +36,7 @@ ArrayBuffer::~ArrayBuffer() {
 
 bool ArrayBuffer::empty() const {
     //return true if array buffer is empty, otherwise return false
-    if (m_buffer == nullptr) {
+    if (m_count == 0) {
         return true;
     }
     return false;
