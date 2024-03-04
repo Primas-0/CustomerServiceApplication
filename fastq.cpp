@@ -31,7 +31,7 @@ void ArrayBuffer::clear() {
 }
 
 ArrayBuffer::~ArrayBuffer() {
-    ArrayBuffer::clear();
+    clear();
 }
 
 bool ArrayBuffer::empty() const {
@@ -100,7 +100,7 @@ const ArrayBuffer &ArrayBuffer::operator=(const ArrayBuffer &rhs) {
     }
 
     //otherwise, destroy current object
-    ArrayBuffer::clear();
+    clear();
 
     //construct current object with same dimensions as rhs
     m_capacity = rhs.m_capacity;
@@ -156,7 +156,7 @@ ListBuffer::ListBuffer(int minBufCapacity) {
 }
 
 ListBuffer::~ListBuffer() {
-    ListBuffer::clear();
+    clear();
 }
 
 void ListBuffer::clear() {
@@ -169,7 +169,7 @@ void ListBuffer::clear() {
     //loop through the linked list and remove each array buffer, until it circles back to the beginning
     do {
         ArrayBuffer *next = curr->m_next;
-        curr->ArrayBuffer::clear();
+        curr->clear();
         curr = next;
     } while (curr != m_cursor);
 
@@ -263,7 +263,7 @@ const ListBuffer &ListBuffer::operator=(const ListBuffer &rhs) {
     }
 
     //otherwise, destroy current object
-    ListBuffer::clear();
+    clear();
 
     //create a deep copy of rhs (identical to copy constructor)
     m_listSize = rhs.m_listSize;
