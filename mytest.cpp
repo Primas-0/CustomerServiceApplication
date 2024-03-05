@@ -151,7 +151,7 @@ bool Tester::testArrayBufferEnqueueAndDequeueNormal() {
 
     //fill the array buffer with a certain number (in this case, 3) of random data
     Random randObject(MINDATA, MAXDATA);
-    for (int i = 3; i > 0; i--) {
+    for (int i = 0; i < 3; i++) {
         int dataToInsert = randObject.getRandInt();
         array.enqueue(dataToInsert);
 
@@ -160,7 +160,7 @@ bool Tester::testArrayBufferEnqueueAndDequeueNormal() {
     }
 
     //check whether we can remove the same sequence of data without a problem
-    for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < 3; i++) {
         if (insertedDataStorage.front() != array.dequeue()) {
             //test fails if data is not removed in first-in-first-out order
             return false;
@@ -196,7 +196,7 @@ bool Tester::testArrayBufferEnqueueAndDequeueBufferSize() {
 
     //completely fill the array buffer with random data (to capacity)
     Random randObject(MINDATA, MAXDATA);
-    for (int i = array.m_capacity; i > 0; i--) {
+    for (int i = 0; i < array.m_capacity; i++) {
         int dataToInsert = randObject.getRandInt();
         array.enqueue(dataToInsert);
 
@@ -205,7 +205,7 @@ bool Tester::testArrayBufferEnqueueAndDequeueBufferSize() {
     }
 
     //check whether we can remove all the data without a problem
-    for (int j = 0; j < array.m_capacity; j++) {
+    for (int i = 0; i < array.m_capacity; i++) {
         if (insertedDataStorage.front() != array.dequeue()) {
             //test fails if data is not removed in first-in-first-out order
             return false;
@@ -219,11 +219,113 @@ bool Tester::testArrayBufferEnqueueAndDequeueBufferSize() {
 }
 
 bool Tester::testArrayBufferEnqueueFull() {
+    ArrayBuffer filledArray(7);
+
+    //fully fill buffer with random data
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < filledArray.m_capacity; i++) {
+        filledArray.enqueue(randObject.getRandInt());
+    }
+
+    try {
+        filledArray.enqueue(randObject.getRandInt());
+    } catch (overflow_error &e) {
+        //test passes if appropriate error is thrown
+        return true;
+    }
     return false;
 }
 
 bool Tester::testArrayBufferDequeueEmpty() {
+    ArrayBuffer filledArray(13);
+
+    try {
+        filledArray.dequeue();
+    } catch (underflow_error &e) {
+        //test passes if appropriate error is thrown
+        return true;
+    }
     return false;
+}
+
+bool Tester::testArrayBufferCopyConstructorEdge() {
+    //original is an empty object
+    ArrayBuffer original(-8);
+
+    ArrayBuffer copy(original);
+
+    if (copy.m_buffer == nullptr && copy.m_capacity == original.m_capacity && copy.m_count == original.m_count &&
+        copy.m_start == original.m_start && copy.m_end == original.m_end && copy.m_next == nullptr) {
+        //test passes if copy is empty
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testArrayBufferCopyConstructorNormal() {
+    ArrayBuffer original(12);
+
+    ArrayBuffer copy(original);
+
+    if (copy.m_buffer == original.m_buffer || copy.m_capacity != original.m_capacity ||
+        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end ||
+        copy.m_next != nullptr) {
+        //test fails if the objects point to the same memory location or other member variables do not match
+        return false;
+    }
+
+    for (int i = 0; i < copy.m_capacity; i++) {
+        if (copy.m_buffer[i] != original.m_buffer[i]) {
+            //test fails if any of the array data is different
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Tester::testArrayBufferAssignmentOperatorEdge() {
+    ArrayBuffer original(-8);
+    ArrayBuffer copy(6);
+
+    //assign empty object (original) to normal object (copy)
+    copy = original;
+
+    if (copy.m_buffer == nullptr && copy.m_capacity == original.m_capacity && copy.m_count == original.m_count &&
+        copy.m_start == original.m_start && copy.m_end == original.m_end && copy.m_next == nullptr) {
+        //test passes if copy is empty
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testArrayBufferAssignmentOperatorNormal() {
+    ArrayBuffer original(2);
+
+    //fill original with random data
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < original.m_capacity; i++) {
+        original.enqueue(randObject.getRandInt());
+    }
+
+    ArrayBuffer copy(7);
+
+    //assign normal object (original) to normal object (copy)
+    copy = original;
+
+    if (copy.m_buffer == original.m_buffer || copy.m_capacity != original.m_capacity ||
+        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end ||
+        copy.m_next != nullptr) {
+        //test fails if the objects point to the same memory location or other member variables do not match
+        return false;
+    }
+
+    for (int i = 0; i < copy.m_capacity; i++) {
+        if (copy.m_buffer[i] != original.m_buffer[i]) {
+            //test fails if any of the array data is different
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -251,7 +353,7 @@ int main() {
     }
 
     //ArrayBuffer clear tests
-    cout << "Testing ArrayBuffer Clear (edge case) - empties the current object:" << endl;
+    cout << "\nTesting ArrayBuffer Clear (edge case) - empties the current object:" << endl;
     if (tester.testArrayBufferClearEmpty()) {
         cout << "\tClear passed!" << endl;
     } else {
@@ -265,7 +367,7 @@ int main() {
     }
 
     //ArrayBuffer empty tests
-    cout << "Testing ArrayBuffer Empty (true case) - ____:" << endl;
+    cout << "\nTesting ArrayBuffer Empty (true case) - ____:" << endl;
     if (tester.testArrayBufferIsEmpty()) {
         cout << "\tEmpty passed!" << endl;
     } else {
@@ -279,7 +381,7 @@ int main() {
     }
 
     //ArrayBuffer enqueue and dequeue tests
-    cout << "Testing ArrayBuffer Enqueue & Dequeue (normal case) - ensures queue functionality for the same number of inserted and removed data:" << endl;
+    cout << "\nTesting ArrayBuffer Enqueue & Dequeue (normal case) - ensures queue functionality for the same number of inserted and removed data:" << endl;
     if (tester.testArrayBufferEnqueueAndDequeueNormal()) {
         cout << "\tEnqueue & Dequeue passed!" << endl;
     } else {
@@ -311,10 +413,32 @@ int main() {
     }
 
     //ArrayBuffer copy constructor tests
-
+    cout << "\nTesting ArrayBuffer Copy Constructor (edge case) - ____:" << endl;
+    if (tester.testArrayBufferCopyConstructorEdge()) {
+        cout << "\tCopy Constructor passed!" << endl;
+    } else {
+        cout << "\t***Copy Constructor failed!***" << endl;
+    }
+    cout << "Testing ArrayBuffer Copy Constructor (normal case) - ____:" << endl;
+    if (tester.testArrayBufferCopyConstructorNormal()) {
+        cout << "\tCopy Constructor passed!" << endl;
+    } else {
+        cout << "\t***Copy Constructor failed!***" << endl;
+    }
 
     //ArrayBuffer assignment operator tests
-
+    cout << "\nTesting ArrayBuffer Assignment Operator (edge case) - ____:" << endl;
+    if (tester.testArrayBufferAssignmentOperatorEdge()) {
+        cout << "\tAssignment Operator passed!" << endl;
+    } else {
+        cout << "\t***Assignment Operator failed!***" << endl;
+    }
+    cout << "Testing ArrayBuffer Assignment Operator (normal case) - ____:" << endl;
+    if (tester.testArrayBufferAssignmentOperatorNormal()) {
+        cout << "\tAssignment Operator passed!" << endl;
+    } else {
+        cout << "\t***Assignment Operator failed!***" << endl;
+    }
 
 
     //ListBuffer constructor tests
