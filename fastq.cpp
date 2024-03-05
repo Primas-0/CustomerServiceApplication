@@ -7,7 +7,7 @@ ArrayBuffer::ArrayBuffer(int capacity) {
         m_buffer = nullptr;
         m_capacity = 0;
     } else {
-        m_buffer = new int[capacity];
+        m_buffer = new int[capacity]();
         m_capacity = capacity;
     }
     //initialize all other member variables
