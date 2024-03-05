@@ -9,4 +9,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(Project1
         fastq.h
         fastq.cpp
-        driver.cpp)
+        mytest.cpp)

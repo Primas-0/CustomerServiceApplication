@@ -8,9 +8,9 @@ const int MAXDATA = 9999;
 class Random {
 public:
     Random(int min, int max) {
-        //UNIFORMINT-type seed and distribution
-        m_randGenerator = std::mt19937(10); //fixed seed value of 10
+        //UNIFORMINT-type distribution and seed
         m_dist = std::uniform_int_distribution<>(min, max);
+        m_randGenerator = std::mt19937(10); //fixed seed value of 10
     }
 
     int getRandInt() {
@@ -18,8 +18,8 @@ public:
         return m_dist(m_randGenerator);
     }
 private:
-    std::mt19937 m_randGenerator;
     std::uniform_int_distribution<> m_dist;
+    std::mt19937 m_randGenerator;
 };
 
 class Tester {
@@ -45,6 +45,22 @@ public:
 
     bool testArrayBufferAssignmentOperatorEdge();
     bool testArrayBufferAssignmentOperatorNormal();
+
+    bool testListBufferConstructorDefault(int minBufCapacity);
+    bool testListBufferConstructorEdge(int minBufCapacity);
+    bool testListBufferConstructorNormal(int minBufCapacity);
+
+    bool testListBufferClear();
+
+    bool testListBufferEnqueueAndDequeueNormal();
+    bool testListBufferEnqueueAndDequeueOneItem();
+    bool testListBufferDequeueEmpty();
+
+    bool testListBufferCopyConstructorEdge();
+    bool testListBufferCopyConstructorNormal();
+
+    bool testListBufferAssignmentOperatorEdge();
+    bool testListBufferAssignmentOperatorNormal();
 };
 
 bool Tester::testArrayBufferConstructorError(int capacity) {
@@ -329,6 +345,99 @@ bool Tester::testArrayBufferAssignmentOperatorNormal() {
 }
 
 
+bool Tester::testListBufferConstructorDefault(int minBufCapacity) {
+    //call constructor with invalid parameter
+    ListBuffer list(minBufCapacity);
+
+    if (list.m_cursor != nullptr && list.m_minBufCapacity == DEFAULT_MIN_CAPACITY &&
+        list.m_cursor->m_next == list.m_cursor && list.m_listSize == 1) {
+        //test passes if default-size linked list constructed
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testListBufferConstructorEdge(int minBufCapacity) {
+    //call constructor with valid parameter
+    ListBuffer list(minBufCapacity);
+
+    if (list.m_cursor != nullptr && list.m_minBufCapacity == minBufCapacity &&
+        list.m_cursor->m_next == list.m_cursor && list.m_listSize == 1) {
+        //test passes if linked list constructed and m_minBufCapacity matches passed-in value
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testListBufferConstructorNormal(int minBufCapacity) {
+    //call constructor with valid parameter
+    ListBuffer list(minBufCapacity);
+
+    if (list.m_cursor != nullptr && list.m_minBufCapacity == minBufCapacity &&
+        list.m_cursor->m_next == list.m_cursor && list.m_listSize == 1) {
+        //test passes if linked list constructed and m_minBufCapacity matches passed-in value
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testListBufferClear() {
+    ListBuffer list(10);
+
+    //TODO: large data sets occasionally generating garbage values
+
+    //fill linked list buffers with a large (in this case, 10000) random data set
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < MAXDATA; i++) {
+        list.enqueue(randObject.getRandInt());
+    }
+
+    list.clear();
+
+    if (list.m_cursor == nullptr && list.m_listSize == 0) {
+        return true;
+    }
+    return false;
+}
+
+bool Tester::testListBufferEnqueueAndDequeueNormal() {
+    ListBuffer list(8);
+
+    vector<int> insertedDataStorage;
+
+    //fill the array buffer with a certain number (in this case, 10000) of random data
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < MAXDATA; i++) {
+        int dataToInsert = randObject.getRandInt();
+        list.enqueue(dataToInsert);
+
+        //store all inserted data in a vector to check against later
+        insertedDataStorage.push_back(dataToInsert);
+    }
+
+    //check whether we can remove the same sequence of data without a problem
+    for (int i = 0; i < MAXDATA; i++) {
+        if (insertedDataStorage.front() != list.dequeue()) {
+            //test fails if data is not removed in first-in-first-out order
+            return false;
+        }
+        //remove the first data value after each check (moves the target to match what should be dequeued)
+        insertedDataStorage.erase(insertedDataStorage.begin());
+    }
+
+    //if insertion and removal happen properly, test passes
+    return true;
+}
+
+bool Tester::testListBufferEnqueueAndDequeueOneItem() {
+    return false;
+}
+
+bool Tester::testListBufferDequeueEmpty() {
+    return false;
+}
+
+
 int main() {
     Tester tester;
 
@@ -353,7 +462,7 @@ int main() {
     }
 
     //ArrayBuffer clear tests
-    cout << "\nTesting ArrayBuffer Clear (edge case) - empties the current object:" << endl;
+    cout << "\nTesting ArrayBuffer Clear (edge case) - ____:" << endl;
     if (tester.testArrayBufferClearEmpty()) {
         cout << "\tClear passed!" << endl;
     } else {
@@ -442,13 +551,52 @@ int main() {
 
 
     //ListBuffer constructor tests
+    cout << "\n\nTesting ListBuffer Constructor (edge case) - allocates memory with default values:" << endl;
+    if (tester.testListBufferConstructorDefault(-9)) {
+        cout << "\tConstructor passed!" << endl;
+    } else {
+        cout << "\t***Constructor failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    if (tester.testListBufferConstructorEdge(1)) {
+        cout << "\tConstructor passed!" << endl;
+    } else {
+        cout << "\t***Constructor failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    if (tester.testListBufferConstructorNormal(9)) {
+        cout << "\tConstructor passed!" << endl;
+    } else {
+        cout << "\t***Constructor failed!***" << endl;
+    }
 
-
-    //ListBuffer clear tests
-
+    //ListBuffer clear test
+    cout << "\nTesting ListBuffer Clear - ____:" << endl;
+    if (tester.testListBufferClear()) {
+        cout << "\tClear passed!" << endl;
+    } else {
+        cout << "\t***Clear failed!***" << endl;
+    }
 
     //ListBuffer enqueue and dequeue tests
-
+    cout << "\nTesting ListBuffer Enqueue & Dequeue (normal case) - ___:" << endl;
+    if (tester.testListBufferEnqueueAndDequeueNormal()) {
+        cout << "\tEnqueue & Dequeue passed!" << endl;
+    } else {
+        cout << "\t***Enqueue/Dequeue failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for one data value:" << endl;
+    if (tester.testListBufferEnqueueAndDequeueOneItem()) {
+        cout << "\tEnqueue & Dequeue passed!" << endl;
+    } else {
+        cout << "\t***Enqueue/Dequeue failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Dequeue (exception case) - ___:" << endl;
+    if (tester.testListBufferDequeueEmpty()) {
+        cout << "\tDequeue passed!" << endl;
+    } else {
+        cout << "\t***Dequeue failed!***" << endl;
+    }
 
     //ListBuffer copy constructor tests
 
