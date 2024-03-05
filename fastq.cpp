@@ -31,7 +31,7 @@ void ArrayBuffer::clear() {
 }
 
 ArrayBuffer::~ArrayBuffer() {
-    clear();
+    ArrayBuffer::clear();
 }
 
 bool ArrayBuffer::empty() const {
@@ -263,7 +263,7 @@ const ListBuffer &ListBuffer::operator=(const ListBuffer &rhs) {
     }
 
     //otherwise, destroy current object
-    clear();
+    ListBuffer::clear();
 
     //create a deep copy of rhs (identical to copy constructor)
     m_listSize = rhs.m_listSize;
