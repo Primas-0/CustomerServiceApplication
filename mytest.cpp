@@ -40,11 +40,11 @@ public:
     bool testArrayBufferEnqueueFull();
     bool testArrayBufferDequeueEmpty();
 
-    bool testArrayBufferCopyConstructorEdge();
-    bool testArrayBufferCopyConstructorNormal();
+    bool testArrayBufferCopyConstructorEdge(ArrayBuffer &original, ArrayBuffer &copy);
+    bool testArrayBufferCopyConstructorNormal(ArrayBuffer &original, ArrayBuffer &copy);
 
-    bool testArrayBufferAssignmentOperatorEdge();
-    bool testArrayBufferAssignmentOperatorNormal();
+    bool testArrayBufferAssignmentOperatorEdge(ArrayBuffer &original, ArrayBuffer &copy);
+    bool testArrayBufferAssignmentOperatorNormal(ArrayBuffer &original, ArrayBuffer &copy);
 
     bool testListBufferConstructorDefault(int minBufCapacity);
     bool testListBufferConstructorEdge(int minBufCapacity);
@@ -263,12 +263,8 @@ bool Tester::testArrayBufferDequeueEmpty() {
     return false;
 }
 
-bool Tester::testArrayBufferCopyConstructorEdge() {
+bool Tester::testArrayBufferCopyConstructorEdge(ArrayBuffer &original, ArrayBuffer &copy) {
     //original is an empty object
-    ArrayBuffer original(-8);
-
-    ArrayBuffer copy(original);
-
     if (copy.m_buffer == nullptr && copy.m_capacity == original.m_capacity && copy.m_count == original.m_count &&
         copy.m_start == original.m_start && copy.m_end == original.m_end && copy.m_next == nullptr) {
         //test passes if copy is empty
@@ -277,14 +273,9 @@ bool Tester::testArrayBufferCopyConstructorEdge() {
     return false;
 }
 
-bool Tester::testArrayBufferCopyConstructorNormal() {
-    ArrayBuffer original(12);
-
-    ArrayBuffer copy(original);
-
+bool Tester::testArrayBufferCopyConstructorNormal(ArrayBuffer &original, ArrayBuffer &copy) {
     if (copy.m_buffer == original.m_buffer || copy.m_capacity != original.m_capacity ||
-        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end ||
-        copy.m_next != nullptr) {
+        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end) {
         //test fails if the objects point to the same memory location or other member variables do not match
         return false;
     }
@@ -298,10 +289,7 @@ bool Tester::testArrayBufferCopyConstructorNormal() {
     return true;
 }
 
-bool Tester::testArrayBufferAssignmentOperatorEdge() {
-    ArrayBuffer original(-8);
-    ArrayBuffer copy(6);
-
+bool Tester::testArrayBufferAssignmentOperatorEdge(ArrayBuffer &original, ArrayBuffer &copy) {
     //assign empty object (original) to normal object (copy)
     copy = original;
 
@@ -313,23 +301,12 @@ bool Tester::testArrayBufferAssignmentOperatorEdge() {
     return false;
 }
 
-bool Tester::testArrayBufferAssignmentOperatorNormal() {
-    ArrayBuffer original(2);
-
-    //fill original with random data
-    Random randObject(MINDATA, MAXDATA);
-    for (int i = 0; i < original.m_capacity; i++) {
-        original.enqueue(randObject.getRandInt());
-    }
-
-    ArrayBuffer copy(7);
-
+bool Tester::testArrayBufferAssignmentOperatorNormal(ArrayBuffer &original, ArrayBuffer &copy) {
     //assign normal object (original) to normal object (copy)
     copy = original;
 
     if (copy.m_buffer == original.m_buffer || copy.m_capacity != original.m_capacity ||
-        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end ||
-        copy.m_next != nullptr) {
+        copy.m_count != original.m_count || copy.m_start != original.m_start || copy.m_end != original.m_end) {
         //test fails if the objects point to the same memory location or other member variables do not match
         return false;
     }
@@ -385,7 +362,7 @@ bool Tester::testListBufferClear() {
 
     //fill linked list buffers with a large (in this case, 10000) random data set
     Random randObject(MINDATA, MAXDATA);
-    for (int i = 0; i < MAXDATA; i++) {
+    for (int i = 0; i < 10000; i++) {
         list.enqueue(randObject.getRandInt());
     }
 
@@ -404,7 +381,7 @@ bool Tester::testListBufferEnqueueAndDequeueNormal() {
 
     //fill the array buffer with a certain number (in this case, 10000) of random data
     Random randObject(MINDATA, MAXDATA);
-    for (int i = 0; i < MAXDATA; i++) {
+    for (int i = 0; i < 10000; i++) {
         int dataToInsert = randObject.getRandInt();
         list.enqueue(dataToInsert);
 
@@ -413,7 +390,7 @@ bool Tester::testListBufferEnqueueAndDequeueNormal() {
     }
 
     //check whether we can remove the same sequence of data without a problem
-    for (int i = 0; i < MAXDATA; i++) {
+    for (int i = 0; i < 10000; i++) {
         if (insertedDataStorage.front() != list.dequeue()) {
             //test fails if data is not removed in first-in-first-out order
             return false;
@@ -439,11 +416,66 @@ bool Tester::testListBufferDequeueEmpty() {
 }
 
 bool Tester::testListBufferCopyConstructorEdge() {
-    return false;
+    ListBuffer original(8);
+
+    //fill only the first buffer
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < original.m_minBufCapacity; i++) {
+        original.enqueue(randObject.getRandInt());
+    }
+
+    ListBuffer copy(original);
+
+    if (original.m_cursor == copy.m_cursor || original.m_listSize != copy.m_listSize ||
+        original.m_minBufCapacity != copy.m_minBufCapacity) {
+        //test fails if the array pointers are the same or the member variables do not match
+        return false;
+    }
+
+    if (!testArrayBufferCopyConstructorNormal(*original.m_cursor, *copy.m_cursor)) {
+        //test fails if the array data is different
+        return false;
+    }
+
+    return true;
 }
 
 bool Tester::testListBufferCopyConstructorNormal() {
-    return false;
+    ListBuffer original(8);
+
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < 10000; i++) {
+        original.enqueue(randObject.getRandInt());
+    }
+
+    ListBuffer copy(original);
+
+    if (original.m_listSize != copy.m_listSize || original.m_minBufCapacity != copy.m_minBufCapacity) {
+        //test fails if member variables do not match
+        return false;
+    }
+
+    //pointers to the first array in each list
+    ArrayBuffer *originalCurr = original.m_cursor;
+    ArrayBuffer *copyCurr = copy.m_cursor;
+
+    for (int i = 0; i < original.m_listSize; i++) {
+        if (originalCurr == copyCurr) {
+            //test fails if any of the array pointers are the same
+            return false;
+        }
+
+        if (!testArrayBufferCopyConstructorNormal(*originalCurr, *copyCurr)) {
+            //test fails if the array data is different for any of the array buffers
+            return false;
+        }
+
+        //advance the array pointers
+        originalCurr = originalCurr->m_next;
+        copyCurr = copyCurr->m_next;
+    }
+
+    return true;
 }
 
 bool Tester::testListBufferAssignmentOperatorEdge() {
@@ -539,28 +571,46 @@ int main() {
     }
 
     //ArrayBuffer copy constructor tests
+    ArrayBuffer original1(-8);
+    ArrayBuffer copy1(original1);
     cout << "\nTesting ArrayBuffer Copy Constructor (edge case) - ____:" << endl;
-    if (tester.testArrayBufferCopyConstructorEdge()) {
+    if (tester.testArrayBufferCopyConstructorEdge(original1, copy1)) {
         cout << "\tCopy Constructor passed!" << endl;
     } else {
         cout << "\t***Copy Constructor failed!***" << endl;
     }
+
+    ArrayBuffer original2(12);
+    Random randObject2(MINDATA, MAXDATA);
+    for (int i = 0; i < 12; i++) {
+        original2.enqueue(randObject2.getRandInt());
+    }
+    ArrayBuffer copy2(original2);
     cout << "Testing ArrayBuffer Copy Constructor (normal case) - ____:" << endl;
-    if (tester.testArrayBufferCopyConstructorNormal()) {
+    if (tester.testArrayBufferCopyConstructorNormal(original2, copy2)) {
         cout << "\tCopy Constructor passed!" << endl;
     } else {
         cout << "\t***Copy Constructor failed!***" << endl;
     }
 
     //ArrayBuffer assignment operator tests
+    ArrayBuffer original3(-8);
+    ArrayBuffer copy3(6);
     cout << "\nTesting ArrayBuffer Assignment Operator (edge case) - ____:" << endl;
-    if (tester.testArrayBufferAssignmentOperatorEdge()) {
+    if (tester.testArrayBufferAssignmentOperatorEdge(original3, copy3)) {
         cout << "\tAssignment Operator passed!" << endl;
     } else {
         cout << "\t***Assignment Operator failed!***" << endl;
     }
+
+    ArrayBuffer original4(2);
+    Random randObject4(MINDATA, MAXDATA);
+    for (int i = 0; i < 2; i++) {
+        original4.enqueue(randObject4.getRandInt());
+    }
+    ArrayBuffer copy4(7);
     cout << "Testing ArrayBuffer Assignment Operator (normal case) - ____:" << endl;
-    if (tester.testArrayBufferAssignmentOperatorNormal()) {
+    if (tester.testArrayBufferAssignmentOperatorNormal(original4, copy4)) {
         cout << "\tAssignment Operator passed!" << endl;
     } else {
         cout << "\t***Assignment Operator failed!***" << endl;
