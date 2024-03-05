@@ -100,7 +100,7 @@ const ArrayBuffer &ArrayBuffer::operator=(const ArrayBuffer &rhs) {
     }
 
     //otherwise, destroy current object
-    clear();
+    ArrayBuffer::clear();
 
     //construct current object with same member variable values as rhs
     m_capacity = rhs.m_capacity;
@@ -156,7 +156,7 @@ ListBuffer::ListBuffer(int minBufCapacity) {
 }
 
 ListBuffer::~ListBuffer() {
-    clear();
+    ListBuffer::clear();
 }
 
 void ListBuffer::clear() {
@@ -169,7 +169,7 @@ void ListBuffer::clear() {
     //loop through the linked list and remove each array buffer, until it circles back to the beginning
     do {
         ArrayBuffer *next = curr->m_next;
-        curr->clear();
+        delete curr;
         curr = next;
     } while (curr != m_cursor);
 
