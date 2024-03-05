@@ -416,7 +416,7 @@ bool Tester::testListBufferDequeueEmpty() {
 }
 
 bool Tester::testListBufferCopyConstructorEdge() {
-    ListBuffer original(8);
+    ListBuffer original(18);
 
     //fill only the first buffer
     Random randObject(MINDATA, MAXDATA);
@@ -441,7 +441,7 @@ bool Tester::testListBufferCopyConstructorEdge() {
 }
 
 bool Tester::testListBufferCopyConstructorNormal() {
-    ListBuffer original(8);
+    ListBuffer original(24);
 
     Random randObject(MINDATA, MAXDATA);
     for (int i = 0; i < 10000; i++) {
@@ -479,11 +479,68 @@ bool Tester::testListBufferCopyConstructorNormal() {
 }
 
 bool Tester::testListBufferAssignmentOperatorEdge() {
-    return false;
+    ListBuffer original(18);
+
+    //fill only the first buffer
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < original.m_minBufCapacity; i++) {
+        original.enqueue(randObject.getRandInt());
+    }
+
+    ListBuffer copy(4);
+    copy = original;
+
+    if (original.m_cursor == copy.m_cursor || original.m_listSize != copy.m_listSize ||
+        original.m_minBufCapacity != copy.m_minBufCapacity) {
+        //test fails if the array pointers are the same or the member variables do not match
+        return false;
+    }
+
+    if (!testArrayBufferCopyConstructorNormal(*original.m_cursor, *copy.m_cursor)) {
+        //test fails if the array data is different
+        return false;
+    }
+
+    return true;
 }
 
 bool Tester::testListBufferAssignmentOperatorNormal() {
-    return false;
+    ListBuffer original(24);
+
+    Random randObject(MINDATA, MAXDATA);
+    for (int i = 0; i < 10000; i++) {
+        original.enqueue(randObject.getRandInt());
+    }
+
+    ListBuffer copy(7);
+    copy = original;
+
+    if (original.m_listSize != copy.m_listSize || original.m_minBufCapacity != copy.m_minBufCapacity) {
+        //test fails if member variables do not match
+        return false;
+    }
+
+    //pointers to the first array in each list
+    ArrayBuffer *originalCurr = original.m_cursor;
+    ArrayBuffer *copyCurr = copy.m_cursor;
+
+    for (int i = 0; i < original.m_listSize; i++) {
+        if (originalCurr == copyCurr) {
+            //test fails if any of the array pointers are the same
+            return false;
+        }
+
+        if (!testArrayBufferCopyConstructorNormal(*originalCurr, *copyCurr)) {
+            //test fails if the array data is different for any of the array buffers
+            return false;
+        }
+
+        //advance the array pointers
+        originalCurr = originalCurr->m_next;
+        copyCurr = copyCurr->m_next;
+    }
+
+    return true;
 }
 
 
