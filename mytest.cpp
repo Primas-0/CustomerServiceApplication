@@ -53,7 +53,6 @@ public:
     bool testListBufferClear();
 
     bool testListBufferEnqueueAndDequeueNormal();
-    bool testListBufferEnqueueAndDequeueOneItem();
     bool testListBufferDequeueEmpty();
 
     bool testListBufferCopyConstructorEdge();
@@ -382,9 +381,7 @@ bool Tester::testListBufferConstructorNormal(int minBufCapacity) {
 }
 
 bool Tester::testListBufferClear() {
-    ListBuffer list(10);
-
-    //TODO: large data sets occasionally generating garbage values
+    ListBuffer list(18);
 
     //fill linked list buffers with a large (in this case, 10000) random data set
     Random randObject(MINDATA, MAXDATA);
@@ -401,7 +398,7 @@ bool Tester::testListBufferClear() {
 }
 
 bool Tester::testListBufferEnqueueAndDequeueNormal() {
-    ListBuffer list(8);
+    ListBuffer list(21);
 
     vector<int> insertedDataStorage;
 
@@ -429,11 +426,31 @@ bool Tester::testListBufferEnqueueAndDequeueNormal() {
     return true;
 }
 
-bool Tester::testListBufferEnqueueAndDequeueOneItem() {
+bool Tester::testListBufferDequeueEmpty() {
+    ListBuffer list(17);
+
+    try {
+        list.dequeue();
+    } catch (underflow_error &e) {
+        //test passes if appropriate error is thrown
+        return true;
+    }
     return false;
 }
 
-bool Tester::testListBufferDequeueEmpty() {
+bool Tester::testListBufferCopyConstructorEdge() {
+    return false;
+}
+
+bool Tester::testListBufferCopyConstructorNormal() {
+    return false;
+}
+
+bool Tester::testListBufferAssignmentOperatorEdge() {
+    return false;
+}
+
+bool Tester::testListBufferAssignmentOperatorNormal() {
     return false;
 }
 
@@ -585,12 +602,6 @@ int main() {
     } else {
         cout << "\t***Enqueue/Dequeue failed!***" << endl;
     }
-    cout << "Testing ListBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for one data value:" << endl;
-    if (tester.testListBufferEnqueueAndDequeueOneItem()) {
-        cout << "\tEnqueue & Dequeue passed!" << endl;
-    } else {
-        cout << "\t***Enqueue/Dequeue failed!***" << endl;
-    }
     cout << "Testing ListBuffer Dequeue (exception case) - ___:" << endl;
     if (tester.testListBufferDequeueEmpty()) {
         cout << "\tDequeue passed!" << endl;
@@ -599,7 +610,30 @@ int main() {
     }
 
     //ListBuffer copy constructor tests
-
+    cout << "\nTesting ListBuffer Copy Constructor (edge case) - ____:" << endl;
+    if (tester.testListBufferCopyConstructorEdge()) {
+        cout << "\tCopy Constructor passed!" << endl;
+    } else {
+        cout << "\t***Copy Constructor failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Copy Constructor (normal case) - ____:" << endl;
+    if (tester.testListBufferCopyConstructorNormal()) {
+        cout << "\tCopy Constructor passed!" << endl;
+    } else {
+        cout << "\t***Copy Constructor failed!***" << endl;
+    }
 
     //ListBuffer assignment operator tests
+    cout << "\nTesting ListBuffer Assignment Operator (edge case) - ____:" << endl;
+    if (tester.testListBufferAssignmentOperatorEdge()) {
+        cout << "\tAssignment Operator passed!" << endl;
+    } else {
+        cout << "\t***Assignment Operator failed!***" << endl;
+    }
+    cout << "Testing ListBuffer Assignment Operator (normal case) - ____:" << endl;
+    if (tester.testListBufferAssignmentOperatorNormal()) {
+        cout << "\tAssignment Operator passed!" << endl;
+    } else {
+        cout << "\t***Assignment Operator failed!***" << endl;
+    }
 }
