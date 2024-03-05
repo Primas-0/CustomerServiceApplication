@@ -74,7 +74,7 @@ int ArrayBuffer::dequeue() {
 }
 
 ArrayBuffer::ArrayBuffer(const ArrayBuffer &rhs) {
-    //construct current object with same dimensions as rhs
+    //construct current object with same member variable values as rhs
     m_capacity = rhs.m_capacity;
     m_count = rhs.m_count;
     m_start = rhs.m_start;
@@ -102,7 +102,7 @@ const ArrayBuffer &ArrayBuffer::operator=(const ArrayBuffer &rhs) {
     //otherwise, destroy current object
     clear();
 
-    //construct current object with same dimensions as rhs
+    //construct current object with same member variable values as rhs
     m_capacity = rhs.m_capacity;
     m_count = rhs.m_count;
     m_start = rhs.m_start;
