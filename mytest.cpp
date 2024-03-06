@@ -17,6 +17,7 @@ public:
         //generate a random integer between the min and max values
         return m_dist(m_randGenerator);
     }
+
 private:
     std::uniform_int_distribution<> m_dist;
     std::mt19937 m_randGenerator;
@@ -554,13 +555,17 @@ int main() {
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout
+            << "Testing ArrayBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:"
+            << endl;
     if (tester.testArrayBufferConstructorEdge(1)) {
         cout << "\tConstructor passed!" << endl;
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout
+            << "Testing ArrayBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:"
+            << endl;
     if (tester.testArrayBufferConstructorNormal(9)) {
         cout << "\tConstructor passed!" << endl;
     } else {
@@ -596,31 +601,38 @@ int main() {
     }
 
     //ArrayBuffer enqueue and dequeue tests
-    cout << "\nTesting ArrayBuffer Enqueue & Dequeue (normal case) - ensures queue functionality for the same number of inserted and removed data:" << endl;
+    cout
+            << "\nTesting ArrayBuffer Enqueue & Dequeue (normal case) - ensures queue functionality for the same number of inserted and removed data:"
+            << endl;
     if (tester.testArrayBufferEnqueueAndDequeueNormal()) {
         cout << "\tEnqueue & Dequeue passed!" << endl;
     } else {
         cout << "\t***Enqueue/Dequeue failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for one data value:" << endl;
+    cout << "Testing ArrayBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for one data value:"
+         << endl;
     if (tester.testArrayBufferEnqueueAndDequeueOneItem()) {
         cout << "\tEnqueue & Dequeue passed!" << endl;
     } else {
         cout << "\t***Enqueue/Dequeue failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for inserting and removing data with the same size as the buffer size:" << endl;
+    cout
+            << "Testing ArrayBuffer Enqueue & Dequeue (edge case) - ensures queue functionality for inserting and removing data with the same size as the buffer size:"
+            << endl;
     if (tester.testArrayBufferEnqueueAndDequeueBufferSize()) {
         cout << "\tEnqueue & Dequeue passed!" << endl;
     } else {
         cout << "\t***Enqueue/Dequeue failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Enqueue (exception case) - inserting into a full buffer correctly throws an error:" << endl;
+    cout << "Testing ArrayBuffer Enqueue (exception case) - inserting into a full buffer correctly throws an error:"
+         << endl;
     if (tester.testArrayBufferEnqueueFull()) {
         cout << "\tEnqueue passed!" << endl;
     } else {
         cout << "\t***Enqueue failed!***" << endl;
     }
-    cout << "Testing ArrayBuffer Dequeue (exception case) - removing from an empty buffer correctly throws an error:" << endl;
+    cout << "Testing ArrayBuffer Dequeue (exception case) - removing from an empty buffer correctly throws an error:"
+         << endl;
     if (tester.testArrayBufferDequeueEmpty()) {
         cout << "\tDequeue passed!" << endl;
     } else {
@@ -681,13 +693,17 @@ int main() {
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing ListBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout
+            << "Testing ListBuffer Constructor (edge case) - allocates memory, initializes all member variables to the proper values:"
+            << endl;
     if (tester.testListBufferConstructorEdge(1)) {
         cout << "\tConstructor passed!" << endl;
     } else {
         cout << "\t***Constructor failed!***" << endl;
     }
-    cout << "Testing ListBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:" << endl;
+    cout
+            << "Testing ListBuffer Constructor (normal case) - allocates memory, initializes all member variables to the proper values:"
+            << endl;
     if (tester.testListBufferConstructorNormal(9)) {
         cout << "\tConstructor passed!" << endl;
     } else {
@@ -703,13 +719,16 @@ int main() {
     }
 
     //ListBuffer enqueue and dequeue tests
-    cout << "\nTesting ListBuffer Enqueue & Dequeue (normal case) - ensures queue functionality across numerous buffers:" << endl;
+    cout
+            << "\nTesting ListBuffer Enqueue & Dequeue (normal case) - ensures queue functionality across numerous buffers:"
+            << endl;
     if (tester.testListBufferEnqueueAndDequeueNormal()) {
         cout << "\tEnqueue & Dequeue passed!" << endl;
     } else {
         cout << "\t***Enqueue/Dequeue failed!***" << endl;
     }
-    cout << "Testing ListBuffer Dequeue (exception case) - removing from an empty buffer correctly throws an error:" << endl;
+    cout << "Testing ListBuffer Dequeue (exception case) - removing from an empty buffer correctly throws an error:"
+         << endl;
     if (tester.testListBufferDequeueEmpty()) {
         cout << "\tDequeue passed!" << endl;
     } else {
@@ -723,7 +742,8 @@ int main() {
     } else {
         cout << "\t***Copy Constructor failed!***" << endl;
     }
-    cout << "Testing ListBuffer Copy Constructor (normal case) - correctly copies a list buffer with numerous nodes:" << endl;
+    cout << "Testing ListBuffer Copy Constructor (normal case) - correctly copies a list buffer with numerous nodes:"
+         << endl;
     if (tester.testListBufferCopyConstructorNormal()) {
         cout << "\tCopy Constructor passed!" << endl;
     } else {
@@ -731,13 +751,15 @@ int main() {
     }
 
     //ListBuffer assignment operator tests
-    cout << "\nTesting ListBuffer Assignment Operator (edge case) - correctly copies a list buffer with one node:" << endl;
+    cout << "\nTesting ListBuffer Assignment Operator (edge case) - correctly copies a list buffer with one node:"
+         << endl;
     if (tester.testListBufferAssignmentOperatorEdge()) {
         cout << "\tAssignment Operator passed!" << endl;
     } else {
         cout << "\t***Assignment Operator failed!***" << endl;
     }
-    cout << "Testing ListBuffer Assignment Operator (normal case) - correctly copies a list buffer with numerous nodes:" << endl;
+    cout << "Testing ListBuffer Assignment Operator (normal case) - correctly copies a list buffer with numerous nodes:"
+         << endl;
     if (tester.testListBufferAssignmentOperatorNormal()) {
         cout << "\tAssignment Operator passed!" << endl;
     } else {
