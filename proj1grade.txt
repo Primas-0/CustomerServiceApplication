@@ -1,0 +1,118 @@
+CMSC341 Project 1 Gradesheet 
+---------------------------------------------------------------------------
+Student ID: mnarend1
+
+Max grade: 100 
+Raw grade: 98
+Late penalty: 0
+Total grade: 98
+
+(Total grade = Raw grade - Late penalty)
+
+
+Issues, comments, notes and deductions marked by an 'X' are the ones
+that apply to your project submission.
+
+
+General comments: Excellent job with your project and use of coding standards as well as testing.
+
+
+
+
+---------------------------------------------------------------------------
+
+Scripted notes and deductions:
+
+
+Checking files
+
+ X == -0: fastq.cpp found
+ X == -0: mytest.cpp found
+
+Compile and Run Unit Tests
+
+ X == -0: No errors in unit test ArrayBufferConstructor
+ X == -0: No errors in unit test ArrayBufferEnqueueDequeue
+ X == -0: No errors in unit test ArrayBufferCopyConsNormal
+ X == -0: No errors in unit test ArrayBufferCopyConsEdge
+ X == -0: No errors in unit test ArrayBufferAssignOpNormal
+ X == -0: No errors in unit test ArrayBufferAssignOpEdge
+ X == -0: No errors in unit test ListBufferConstructor
+ X == -0: No errors in unit test ListBufferEnqueueDequeue
+ X == -0: No errors in unit test ListBufferClear
+ X == -0: No errors in unit test ListBufferCopyConstructor
+ X == -0: No errors in unit test ListBufferAssignmentOp
+ X == -0: No errors in unit test TestExceptionEmptyArray
+ X == -0: No errors in unit test TestExceptionEmptyList
+ X == -0: No errors in unit test TestExceptionFullArray
+ X == -2: Unit test TestEnqueueAfterClear did not run to completion
+
+Compile and Run mytest.cpp
+
+ X == -0: Student test program (mytest.cpp) ran to completion.
+ X == -0: Student test program (mytest.cpp) ran without memory leaks.
+ X == -0: Student test program (mytest.cpp) ran without memory errors.
+
+---------------------------------------------------------------------------
+
+I. Effort Grading
+
+   Program does not compile or does not run, or runs but does not
+   produce output even after minor tweaks. Grading based on effort.
+   Deductions from scripted grading and deductions marked below are
+   ignored. Late penalties still apply.
+
+   Choose one only:
+
+   ~~  60:  Removing one or two major bugs will fix this project.
+   ~~  45:  Significant progress made, but major rewrite is necessary.
+   ~~  30:  Not much progress made. 
+   ~~  15:  Barely started coding. 
+   ~~   0:  Morally equivalent to no submission.
+   
+           Comment: 
+
+
+---------------------------------------------------------------------------
+
+II. Tests in mytest.cpp
+
+   A. Project classes
+
+   == -2: Testing ArrayBuffer enqueue for a normal case
+   == -2: Testing ArrayBuffer enqueue for an edge case
+   == -1: Testing ArrayBuffer dequeue for a normal case
+   == -1: Testing ArrayBuffer dequeue for an edge case
+   == -1: Testing ArrayBuffer throws exception for enqueue in a full buffer
+   == -1: Testing ArrayBuffer throws exception for dequeue from empty buffer
+   == -1: Testing ArrayBuffer copy constructor for a normal case
+   == -2: Testing ListBuffer enqueue for a normal case
+   == -1: Testing ListBuffer throws exception for dequeue from empty buffer
+   == -1: Testing ListBuffer copy constructor for a normal case
+   == -1: Testing ListBuffer copy constructor for an edge case
+   == -1: Testing ListBuffer assignment operator for a normal case
+
+
+          Comment: No test was missing
+
+
+---------------------------------------------------------------------------
+
+IV. Coding Standards
+
+ X == -0:  Good indentation, comments, and choice of variable names
+
+   == -2:  Poor or inconsistent indentation
+
+   == -2:  Program uses global variables or static data members in lieu of 
+           parameters and return values
+
+   == -2:  In-line comments are terse and not meaningful
+   == -3:  In-line comments are non-existent
+
+   == -1:  Poor choice of variable names
+   
+           Comment: Good coding standard usage
+
+
+---------------------------------------------------------------------------
